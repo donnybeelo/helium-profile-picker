@@ -1,0 +1,17 @@
+[package]
+name = "helium-profile-picker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eframe = { version = "0.33", default-features = true, features = ["glow"] }
+egui = "0.33"
+image = { version = "0.25", default-features = false, features = ["png"] }
+serde_json = "1"
+sha1 = "0.10"
+anyhow = "1"
+dirs = "5"
+hex = "0.4"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winbase", "processthreadsapi", "shellapi"] }

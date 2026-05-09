@@ -1,0 +1,25 @@
+use egui::Color32;
+
+pub(crate) const APP_ID: &str = "net.imput.helium";
+pub(crate) const APP_NAME: &str = "helium-profile-picker";
+pub(crate) const WINDOW_BG: Color32 = Color32::TRANSPARENT;
+pub(crate) const PANEL_BG: Color32 = Color32::from_rgb(0x25, 0x25, 0x25);
+pub(crate) const CARD_BG: Color32 = Color32::from_rgb(0x2b, 0x2b, 0x2b);
+pub(crate) const CARD_BG_HOVER: Color32 = Color32::from_rgb(0x3a, 0x3a, 0x3a);
+pub(crate) const BORDER: Color32 = Color32::from_rgb(0x37, 0x37, 0x37);
+pub(crate) const TEXT: Color32 = Color32::from_rgb(0xee, 0xee, 0xee);
+pub(crate) const MUTED_TEXT: Color32 = Color32::from_rgb(0xf2, 0xf2, 0xf2);
+pub(crate) const BADGE_BG: Color32 = Color32::from_rgb(0x4a, 0x4a, 0x4a);
+pub(crate) const BADGE_BORDER: Color32 = Color32::from_rgb(0x5a, 0x5a, 0x5a);
+pub(crate) const CLOSE_BG: Color32 = Color32::from_rgb(0x33, 0x33, 0x33);
+pub(crate) const CLOSE_BG_HOVER: Color32 = Color32::from_rgb(0x44, 0x44, 0x44);
+pub(crate) const AVATAR_BG: Color32 = Color32::from_rgb(0x30, 0x30, 0x30);
+pub(crate) const AVATAR_BORDER: Color32 = Color32::from_rgb(0x3b, 0x3b, 0x3b);
+pub(crate) const CARD_WIDTH: f32 = 170.0;
+pub(crate) const CARD_HEIGHT: f32 = 200.0;
+pub(crate) const CARD_MARGIN_X: f32 = 15.0;
+pub(crate) const PANEL_INNER_PADDING: f32 = 20.0;
+pub(crate) const HEADER_HEIGHT: f32 = 38.0;
+pub(crate) const URL_ROW_HEIGHT: f32 = 38.0;
+pub(crate) const CONTENT_GAP: f32 = 8.0;
+pub(crate) const PROFILE_ROW_GAP: f32 = 16.0;
