@@ -21,16 +21,20 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context) {
     }
 
     let painter = ui.painter_at(rect);
-    painter.text(
-        Pos2::new(rect.center().x, rect.center().y + 1.0),
-        egui::Align2::CENTER_CENTER,
-        "Helium",
-        egui::FontId::proportional(18.0),
-        TEXT,
-    );
+    let title_pos = Pos2::new(rect.center().x, rect.top() + 10.0);
+    let title_font = egui::FontId::proportional(16.0);
+    for offset in [Vec2::new(-0.1, 0.0), Vec2::ZERO] {
+        painter.text(
+            title_pos + offset,
+            egui::Align2::CENTER_CENTER,
+            "Helium",
+            title_font.clone(),
+            TEXT,
+        );
+    }
 
     let close_rect = Rect::from_min_size(
-        Pos2::new(rect.max.x - 38.0, rect.center().y - 18.0),
+        Pos2::new(rect.max.x - 32.0, rect.top() - 5.0),
         Vec2::splat(36.0),
     );
     let close = draw_circle_close_button(ui, close_rect);
