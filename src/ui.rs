@@ -26,7 +26,10 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) 
             rect.left() - PANEL_INNER_PADDING,
             rect.top() - PANEL_INNER_PADDING,
         ),
-        Pos2::new(rect.right() + PANEL_INNER_PADDING, rect.bottom() - CONTENT_GAP),
+        Pos2::new(
+            rect.right() + PANEL_INNER_PADDING,
+            rect.bottom() - CONTENT_GAP,
+        ),
     );
     let drag_response = ui.interact(drag_rect, ui.id().with("header_drag_zone"), Sense::click());
     if drag_response.is_pointer_button_down_on() && ctx.input(|i| i.pointer.primary_pressed()) {
@@ -38,6 +41,17 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) 
             Pos2::new(rect.left() + 2.0, rect.top() - 5.0),
             Vec2::new(rect.width() - 48.0, URL_ROW_HEIGHT),
         );
+
+        let pointer_started_in_address = ctx.input(|i| {
+            i.pointer.primary_pressed()
+                && i.pointer
+                    .interact_pos()
+                    .is_some_and(|pos| address_rect.contains(pos))
+        });
+        if pointer_started_in_address {
+            ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
+        }
+
         url_row(ui, address_rect, url);
     } else {
         let title_pos = Pos2::new(rect.center().x, rect.top() + 10.0);
@@ -82,6 +96,8 @@ pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str) {
                 .max_height(inner.height())
                 .max_width(inner.width() - URL_ROW_HEIGHT / 1.5)
                 .auto_shrink([false; 2])
+                .scroll_source(egui::scroll_area::ScrollSource::MOUSE_WHEEL)
+                .scroll_bar_visibility(egui::scroll_area::ScrollBarVisibility::AlwaysHidden)
                 .show(ui, |ui| {
                     ui.add_sized(
                         ui.available_size(),
@@ -91,10 +107,10 @@ pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str) {
                                 .color(TEXT)
                                 .monospace(),
                         )
+                        .selectable(false)
                         .wrap_mode(egui::TextWrapMode::Extend),
                     );
                 });
-                
         });
     });
 }
