@@ -77,19 +77,16 @@ pub(crate) fn profile_card(
 ) -> Response {
     let response = ui.interact(rect, ui.id().with(("profile_card", index)), Sense::click());
     let painter = ui.painter_at(rect);
+    let hovered = ui.rect_contains_pointer(rect);
 
-    let bg = if response.hovered() {
-        CARD_BG_HOVER
-    } else {
-        CARD_BG
-    };
+    let bg = if hovered { CARD_BG_HOVER } else { CARD_BG };
     painter.rect_filled(rect, CornerRadius::same(18), bg);
     painter.rect_stroke(
         rect,
         CornerRadius::same(18),
         Stroke::new(
             1.0,
-            if response.hovered() {
+            if hovered {
                 Color32::from_rgb(0x44, 0x44, 0x44)
             } else {
                 BORDER
@@ -165,11 +162,8 @@ pub(crate) fn profile_card(
 pub(crate) fn draw_circle_close_button(ui: &mut egui::Ui, rect: Rect) -> Response {
     let response = ui.allocate_rect(rect, Sense::click());
     let painter = ui.painter_at(rect);
-    let fill = if response.hovered() {
-        CLOSE_BG_HOVER
-    } else {
-        CLOSE_BG
-    };
+    let hovered = ui.rect_contains_pointer(rect);
+    let fill = if hovered { CLOSE_BG_HOVER } else { CLOSE_BG };
     let center = rect.center();
     let radius = rect.width() / 2.0;
     painter.circle_filled(center, radius, fill);
