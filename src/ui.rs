@@ -73,13 +73,30 @@ pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str) {
         Stroke::new(1.0, BORDER),
         StrokeKind::Outside,
     );
-    painter.text(
-        inner.center(),
-        egui::Align2::CENTER_CENTER,
-        url,
-        egui::FontId::proportional(14.0),
-        TEXT,
-    );
+
+    ui.scope_builder(egui::UiBuilder::new().max_rect(inner), |ui| {
+        ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+            ui.add_space(URL_ROW_HEIGHT / 3.0);
+            egui::ScrollArea::horizontal()
+                .id_salt("url_row_scroll")
+                .max_height(inner.height())
+                .max_width(inner.width() - URL_ROW_HEIGHT / 1.5)
+                .auto_shrink([false; 2])
+                .show(ui, |ui| {
+                    ui.add_sized(
+                        ui.available_size(),
+                        egui::Label::new(
+                            egui::RichText::new(url)
+                                .font(egui::FontId::proportional(14.0))
+                                .color(TEXT)
+                                .monospace(),
+                        )
+                        .wrap_mode(egui::TextWrapMode::Extend),
+                    );
+                });
+                
+        });
+    });
 }
 
 pub(crate) fn profile_card(
