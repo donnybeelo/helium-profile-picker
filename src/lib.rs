@@ -33,20 +33,22 @@ pub fn run() -> Result<()> {
     let width = app.window_width();
     let height = app.window_height();
 
-    let mut viewport = egui::ViewportBuilder::default()
-        .with_app_id("helium")
-        .with_decorations(false)
-        .with_transparent(true)
-        .with_resizable(false)
-        .with_inner_size([width, height])
-        .with_min_inner_size([width, height])
-        .with_max_inner_size([width, height])
-        .with_title("Helium");
+    let viewport = {
+        let viewport = egui::ViewportBuilder::default()
+            .with_app_id("helium")
+            .with_decorations(false)
+            .with_transparent(true)
+            .with_resizable(false)
+            .with_inner_size([width, height])
+            .with_min_inner_size([width, height])
+            .with_max_inner_size([width, height])
+            .with_title("Helium");
 
-    #[cfg(target_os = "windows")]
-    {
-        viewport = viewport.with_transparent(false);
-    }
+        #[cfg(target_os = "windows")]
+        let viewport = viewport.with_transparent(false);
+
+        viewport
+    };
 
     let options = eframe::NativeOptions {
         viewport,

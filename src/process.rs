@@ -1,5 +1,4 @@
 use std::env;
-use std::path::Path;
 
 use std::process::{Command, Stdio};
 
@@ -38,7 +37,7 @@ pub(crate) fn resolve_helium_bin() -> String {
             r"C:\Users\delia\AppData\Local\imput\Helium\Application\chrome.exe",
         ];
         for candidate in candidates {
-            if Path::new(candidate).exists() {
+            if std::path::Path::new(candidate).exists() {
                 return candidate.to_owned();
             }
         }
