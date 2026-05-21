@@ -11,7 +11,7 @@ pub(crate) fn fit_inside(container: Rect, image_size: Vec2) -> Rect {
     Rect::from_center_size(container.center(), size)
 }
 
-pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) {
+pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, app: &mut crate::app::HeliumApp) {
     let width = ui.available_width();
     let height = HEADER_HEIGHT;
     let (rect, _) = ui.allocate_exact_size(Vec2::new(width, height), Sense::hover());
@@ -52,7 +52,7 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) 
             ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
         }
 
-        url_row(ui, address_rect, url);
+        url_row(ui, address_rect, url, app, ctx);
     } else {
         let title_pos = Pos2::new(rect.center().x, rect.top() + 10.0);
         let title_font = egui::FontId::proportional(16.0);
@@ -73,7 +73,7 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>) 
     }
 }
 
-pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str) {
+pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str, app: &mut crate::app::HeliumApp, ctx: &egui::Context) {
     let painter = ui.painter_at(rect);
     let inner = rect.shrink(1.0);
     painter.rect_filled(
@@ -87,6 +87,13 @@ pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str) {
         Stroke::new(1.0, BORDER),
         StrokeKind::Outside,
     );
+
+    let response = ui.interact(rect, ui.id().with("url_row_interaction"), Sense::click_and_drag());
+    
+    if response.secondary_clicked() {
+        ui.ctx().copy_text(url.to_string());
+        app.show_copy_popup(ctx);
+    }
 
     ui.scope_builder(egui::UiBuilder::new().max_rect(inner), |ui| {
         ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {

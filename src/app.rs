@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::time::Instant;
 
 use anyhow::Result;
 use eframe::{egui, egui::Vec2};
@@ -23,6 +24,8 @@ pub(crate) struct HeliumApp {
     pub(crate) avatars: HashMap<String, AvatarImage>,
     pub(crate) helium_bin: String,
     pub(crate) error: Option<String>,
+    pub(crate) copy_time: Option<Instant>,
+    pub(crate) copy_pos: Option<egui::Pos2>,
 }
 
 impl HeliumApp {
@@ -63,6 +66,8 @@ impl HeliumApp {
             avatars: HashMap::new(),
             helium_bin,
             error: None,
+            copy_time: None,
+            copy_pos: None,
         })
     }
 
@@ -114,6 +119,11 @@ impl HeliumApp {
             Err(err) => self.error = Some(format!("Could not launch Helium: {err:#}")),
         }
         result
+    }
+
+    pub(crate) fn show_copy_popup(&mut self, ctx: &egui::Context) {
+        self.copy_time = Some(Instant::now());
+        self.copy_pos = ctx.input(|i| i.pointer.latest_pos());
     }
 
     fn profile_grid(&mut self, ui: &mut egui::Ui, ctx: &egui::Context) {
@@ -227,11 +237,12 @@ impl eframe::App for HeliumApp {
                     );
                 }
 
+                let url = self.url.clone();
                 ui.scope_builder(
                     egui::UiBuilder::new().max_rect(panel_rect.shrink(PANEL_INNER_PADDING)),
                     |ui| {
                         ui.vertical(|ui| {
-                            header(ui, ctx, self.url.as_deref());
+                            header(ui, ctx, url.as_deref(), self);
                             ui.add_space(8.0);
                             self.profile_grid(ui, ctx);
                             if let Some(err) = &self.error {
@@ -244,6 +255,112 @@ impl eframe::App for HeliumApp {
                         });
                     },
                 );
+
+                // Render copy popup if recently copied
+                if let Some(copy_time) = self.copy_time {
+                    let elapsed = copy_time.elapsed().as_secs_f32();
+                    let opaque_duration = 0.9;
+                    let fade_duration = 0.1;
+                    let total_duration = opaque_duration + fade_duration;
+                    
+                    if elapsed < total_duration {
+                        let painter = ui.painter();
+                        let alpha = if elapsed < opaque_duration {
+                            1.0
+                        } else {
+                            ((total_duration - elapsed) / fade_duration).clamp(0.0, 1.0)
+                        };
+                        
+                        // Position next to cursor
+                        let toast_width = 120.0;
+                        let toast_height = 40.0;
+                        let offset = 15.0;
+                        
+                        let mut toast_x = if let Some(pos) = self.copy_pos {
+                            pos.x + offset
+                        } else {
+                            panel_rect.right() - toast_width - 12.0
+                        };
+                        
+                        // Clamp to prevent clipping right edge
+                        let max_x = panel_rect.right() - toast_width;
+                        toast_x = toast_x.min(max_x);
+                        // Also clamp left edge
+                        toast_x = toast_x.max(panel_rect.left());
+                        
+                        let toast_y = if let Some(pos) = self.copy_pos {
+                            pos.y + offset
+                        } else {
+                            panel_rect.top() + 12.0
+                        };
+                        
+                        let toast_rect = egui::Rect::from_min_size(
+                            egui::Pos2::new(toast_x, toast_y),
+                            egui::Vec2::new(toast_width, toast_height),
+                        );
+                        
+                        // Draw background with libadwaita style
+                        let bg_color = Color32::from_rgba_unmultiplied(
+                            50, 50, 50,
+                            (alpha * 255.0) as u8,
+                        );
+                        painter.rect_filled(toast_rect, CornerRadius::same(12), bg_color);
+                        
+                        // Draw border
+                        painter.rect_stroke(
+                            toast_rect,
+                            CornerRadius::same(12),
+                            Stroke::new(1.0, Color32::from_rgba_unmultiplied(100, 100, 100, (alpha * 100.0) as u8)),
+                            StrokeKind::Outside,
+                        );
+                        
+                        // Draw copy icon (two overlapping squares)
+                        let icon_center = egui::Pos2::new(toast_rect.left() + 20.0, toast_rect.center().y);
+                        let icon_color = Color32::from_rgba_unmultiplied(255, 255, 255, (alpha * 255.0) as u8);
+                        let stroke = Stroke::new(1.5, icon_color);
+                        
+                        // Draw back square (fully)
+                        let back_rect = egui::Rect::from_center_size(
+                            icon_center + egui::Vec2::new(-1.0, 1.0),
+                            egui::Vec2::new(8.0, 8.0),
+                        );
+                        painter.rect_stroke(back_rect, CornerRadius::same(1), stroke, StrokeKind::Outside);
+                        
+                        // Draw front square with only top and right lines visible
+                        let front_rect = egui::Rect::from_center_size(
+                            icon_center + egui::Vec2::new(1.0, -1.0),
+                            egui::Vec2::new(8.0, 8.0),
+                        );
+                        
+                        // Draw top line of front square
+                        painter.line_segment(
+                            [front_rect.left_top(), front_rect.right_top()],
+                            stroke,
+                        );
+                        
+                        // Draw right line of front square
+                        painter.line_segment(
+                            [front_rect.right_top(), front_rect.right_bottom()],
+                            stroke,
+                        );
+                        
+                        // Draw text
+                        let text_pos = egui::Pos2::new(toast_rect.center().x + 12.0, toast_rect.center().y);
+                        let text_color = Color32::from_rgba_unmultiplied(255, 255, 255, (alpha * 255.0) as u8);
+                        painter.text(
+                            text_pos,
+                            egui::Align2::CENTER_CENTER,
+                            "Copied!",
+                            egui::FontId::proportional(13.0),
+                            text_color,
+                        );
+                        
+                        ctx.request_repaint();
+                    } else {
+                        self.copy_time = None;
+                        self.copy_pos = None;
+                    }
+                }
             });
     }
 }
