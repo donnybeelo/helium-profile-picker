@@ -275,10 +275,10 @@ impl eframe::App for HeliumApp {
                         const OFFSET: f32 = 15.0;
                         
                         let mut toast_x = self.copy_pos.map_or(
-                            (panel_rect.right() - TOAST_WIDTH - 12.0).min(panel_rect.right() - TOAST_WIDTH),
+                            (panel_rect.right() - TOAST_WIDTH - 12.0).min(panel_rect.right() - TOAST_WIDTH - 2.0),
                             |pos| pos.x + OFFSET,
                         );
-                        toast_x = toast_x.clamp(panel_rect.left(), panel_rect.right() - TOAST_WIDTH);
+                        toast_x = toast_x.clamp(panel_rect.left(), panel_rect.right() - TOAST_WIDTH - 2.0);
                         
                         let toast_y = self.copy_pos.map_or(
                             panel_rect.top() + 12.0,
