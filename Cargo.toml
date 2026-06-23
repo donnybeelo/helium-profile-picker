@@ -1,9 +1,21 @@
 [package]
-name = "helium-profile-picker"
+name = "chromium-profile-picker"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["chrome"]
+chrome = []
+chromium = []
+brave = []
+edge = []
+vivaldi = []
+opera = []
+arc = []
+helium = []
+
 [dependencies]
+serde = { version = "1", features = ["derive"] }
 eframe = { version = "0.33", default-features = true, features = ["glow"] }
 egui = "0.33"
 image = { version = "0.25", default-features = false, features = ["png"] }

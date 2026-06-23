@@ -6,36 +6,29 @@ use anyhow::Result;
 use eframe::{egui, egui::Vec2};
 use egui::{Color32, CornerRadius, Sense, Stroke, StrokeKind};
 
-#[cfg(target_os = "windows")]
-const USE_CUSTOM_PANEL_ROUNDING: bool = false;
-#[cfg(not(target_os = "windows"))]
-const USE_CUSTOM_PANEL_ROUNDING: bool = true;
 
 use crate::avatars::load_avatar_texture;
-use crate::config::helium_config_dir;
+use crate::browser::BrowserConfig;
 use crate::constants::*;
 use crate::models::{AvatarImage, Profile, ProfileView};
 use crate::process::launch;
 use crate::ui::{header, profile_card};
 
-pub(crate) struct HeliumApp {
+pub(crate) struct App {
     pub(crate) url: Option<String>,
     pub(crate) profiles: Vec<ProfileView>,
     pub(crate) avatars: HashMap<String, AvatarImage>,
-    pub(crate) helium_bin: String,
+    pub(crate) browser_bin: String,
+    pub(crate) title: String,
     pub(crate) error: Option<String>,
     pub(crate) copy_time: Option<Instant>,
     pub(crate) copy_pos: Option<egui::Pos2>,
 }
 
-impl HeliumApp {
-    pub(crate) fn new(
-        url: Option<String>,
-        profiles: Vec<Profile>,
-        helium_bin: String,
-    ) -> Result<Self> {
+impl App {
+    pub(crate) fn new(url: Option<String>, profiles: Vec<Profile>, browser: BrowserConfig) -> Result<Self> {
         let mut views = Vec::with_capacity(profiles.len());
-        let config_dir = helium_config_dir();
+        let config_dir = browser.config_dir_path();
 
         for profile in profiles {
             let avatar_path = if profile.is_using_custom_avatar {
@@ -64,7 +57,8 @@ impl HeliumApp {
             url,
             profiles: views,
             avatars: HashMap::new(),
-            helium_bin,
+            title: format!("{} — Profile Picker", browser.name),
+            browser_bin: browser.binary,
             error: None,
             copy_time: None,
             copy_pos: None,
@@ -113,10 +107,10 @@ impl HeliumApp {
     }
 
     pub(crate) fn launch_profile(&mut self, profile_dir: &str) -> Result<()> {
-        let result = launch(&self.helium_bin, self.url.as_deref(), profile_dir);
+        let result = launch(&self.browser_bin, self.url.as_deref(), profile_dir);
         match &result {
             Ok(_) => self.error = None,
-            Err(err) => self.error = Some(format!("Could not launch Helium: {err:#}")),
+            Err(err) => self.error = Some(format!("Could not launch browser: {err:#}")),
         }
         result
     }
@@ -174,7 +168,7 @@ impl HeliumApp {
     }
 }
 
-impl eframe::App for HeliumApp {
+impl eframe::App for App {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
         egui::Rgba::TRANSPARENT.to_array()
     }
@@ -219,7 +213,7 @@ impl eframe::App for HeliumApp {
                 let panel_rect = ui.max_rect();
                 let painter = ui.painter();
 
-                if USE_CUSTOM_PANEL_ROUNDING {
+                if cfg!(not(target_os = "windows")) {
                     painter.rect_filled(panel_rect, CornerRadius::same(30), PANEL_BG);
                     painter.rect_stroke(
                         panel_rect,

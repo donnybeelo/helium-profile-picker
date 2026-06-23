@@ -1,3 +1,3 @@
 fn main() -> anyhow::Result<()> {
-    helium_profile_picker::run()
+    chromium_profile_picker::run()
 }

@@ -11,7 +11,7 @@ pub(crate) fn fit_inside(container: Rect, image_size: Vec2) -> Rect {
     Rect::from_center_size(container.center(), size)
 }
 
-pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, app: &mut crate::app::HeliumApp) {
+pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, app: &mut crate::app::App) {
     let width = ui.available_width();
     let height = HEADER_HEIGHT;
     let (rect, _) = ui.allocate_exact_size(Vec2::new(width, height), Sense::hover());
@@ -60,7 +60,7 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, 
             painter.text(
                 title_pos + offset,
                 egui::Align2::CENTER_CENTER,
-                "Helium",
+                &app.title,
                 title_font.clone(),
                 TEXT,
             );
@@ -73,7 +73,7 @@ pub(crate) fn header(ui: &mut egui::Ui, ctx: &egui::Context, url: Option<&str>, 
     }
 }
 
-pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str, app: &mut crate::app::HeliumApp, ctx: &egui::Context) {
+pub(crate) fn url_row(ui: &mut egui::Ui, rect: Rect, url: &str, app: &mut crate::app::App, ctx: &egui::Context) {
     let painter = ui.painter_at(rect);
     let inner = rect.shrink(1.0);
     painter.rect_filled(

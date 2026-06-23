@@ -1,14 +1,13 @@
 use std::collections::HashSet;
 use std::fs;
+use std::path::PathBuf;
 
 use serde_json::Value;
 
-use crate::config::helium_config_dir;
 use crate::models::Profile;
 
-pub(crate) fn load_profiles() -> Vec<Profile> {
+pub(crate) fn load_profiles(config_dir: PathBuf) -> Vec<Profile> {
     let mut profiles = Vec::new();
-    let config_dir = helium_config_dir();
     let local_state = config_dir.join("Local State");
 
     let add_profile = |dir_name: String, info: &Value, profiles: &mut Vec<Profile>| {

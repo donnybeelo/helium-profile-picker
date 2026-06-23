@@ -1,7 +1,7 @@
 use egui::Color32;
 
-pub(crate) const APP_ID: &str = "net.imput.helium";
-pub(crate) const APP_NAME: &str = "helium-profile-picker";
+pub(crate) const APP_ID: &str = "net.donnybeelo.chromium-profile-picker";
+pub(crate) const APP_NAME: &str = "chromium-profile-picker";
 pub(crate) const WINDOW_BG: Color32 = Color32::TRANSPARENT;
 pub(crate) const PANEL_BG: Color32 = Color32::from_rgb(0x25, 0x25, 0x25);
 pub(crate) const CARD_BG_HOVER: Color32 = Color32::from_rgb(0x2b, 0x2b, 0x2b);

@@ -1,48 +1,67 @@
-# Helium Profile Picker
+# Chromium Profile Picker
 
-A cross-platform good-looking profile picker for the [Helium browser](https://github.com/imputnet/helium), written in Rust.
+A cross-platform good-looking profile picker for Chromium-based browsers, written in Rust.
 
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/c3eef927-7363-484c-948d-f8cf447b1633" />
 
-(Works with any Chromium browser)
+## Supported browsers
+
+| Feature flag | Browser |
+|---|---|
+| `chrome` *(default)* | Google Chrome |
+| `chromium` | Chromium |
+| `brave` | Brave Browser |
+| `edge` | Microsoft Edge |
+| `vivaldi` | Vivaldi |
+| `opera` | Opera |
+| `arc` | Arc *(macOS / Windows only)* |
+| `helium` | Helium |
 
 ## Installation
 
-To install using cargo, run the following:
-
 ```bash
-cargo install --git https://github.com/donnybeelo/helium-profile-picker
+cargo install --git https://github.com/donnybeelo/chromium-profile-picker --no-default-features --features helium
 ```
 
-Locate your .desktop file for helium, and make it launch `helium-profile-picker` in the `Exec` field. Do the same for the "New Window" desktop action, if it exists.
+Replace `helium` with the feature for your browser. Only one feature should be active at a time.
+
+Locate your `.desktop` file for your browser and set `chromium-profile-picker` as the `Exec` command. Do the same for the "New Window" desktop action if it exists.
+
+## Configuration
+
+On first run the picker auto-detects the browser binary and profile directory and writes a config file to:
+
+- **Linux:** `~/.config/net.donnybeelo.chromium-profile-picker/browser.json`
+- **macOS:** `~/Library/Application Support/net.donnybeelo.chromium-profile-picker/browser.json`
+- **Windows:** `%APPDATA%\net.donnybeelo.chromium-profile-picker\browser.json`
+
+Edit this file to override any auto-detected paths. The config is regenerated automatically when you switch browser features.
 
 ## Build from source
 
-After cloning the repository, build using cargo:
-
 ```bash
-cargo build --release
+cargo build --release --no-default-features --features helium
 ```
 
 The release binary will be in:
 
 ```bash
-./target/release/helium-profile-picker
+./target/release/chromium-profile-picker
 ```
 
 ### Run
 
 ```bash
-cargo run -- "https://example.com"
+cargo run --no-default-features --features helium -- "https://example.com"
 ```
 
 Or without a URL:
 
 ```bash
-cargo run
+cargo run --no-default-features --features helium
 ```
 
 ## Environment variables
 
-- `HELIUM_CONFIG_DIR` — override the Helium profile directory, e.g. `"~/.config/google-chrome"`
-- `HELIUM_BIN` — override the Helium executable path, e.g. `"google-chrome"`
+- `BROWSER_BIN` — override the browser executable path
+- `BROWSER_CONFIG_DIR` — override the browser profile directory

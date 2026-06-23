@@ -4,48 +4,6 @@ use std::process::{Command, Stdio};
 
 use anyhow::{Context, Result};
 
-pub(crate) fn resolve_helium_bin() -> String {
-    if let Ok(bin) = env::var("HELIUM_BIN") {
-        return bin;
-    }
-
-    if let Some(path) = which("helium") {
-        return path;
-    }
-    if let Some(path) = which("chrome.exe") {
-        return path;
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        let candidates = [
-            "/Applications/Helium.app/Contents/MacOS/Helium",
-            "/Applications/Helium.app/Contents/MacOS/helium",
-        ];
-        for candidate in candidates {
-            if Path::new(candidate).exists() {
-                return candidate.to_owned();
-            }
-        }
-    }
-
-    #[cfg(target_os = "windows")]
-    {
-        let candidates = [
-            r"C:\Program Files\Helium\Application\chrome.exe",
-            r"C:\Program Files (x86)\Helium\Application\chrome.exe",
-            r"C:\Users\delia\AppData\Local\imput\Helium\Application\chrome.exe",
-        ];
-        for candidate in candidates {
-            if std::path::Path::new(candidate).exists() {
-                return candidate.to_owned();
-            }
-        }
-    }
-
-    "helium".to_owned()
-}
-
 pub(crate) fn which(exe: &str) -> Option<String> {
     let paths = env::var_os("PATH")?;
     for path in env::split_paths(&paths) {
@@ -64,8 +22,8 @@ pub(crate) fn which(exe: &str) -> Option<String> {
     None
 }
 
-pub(crate) fn launch(helium_bin: &str, url: Option<&str>, profile_dir: &str) -> Result<()> {
-    let mut cmd = Command::new(helium_bin);
+pub(crate) fn launch(browser_bin: &str, url: Option<&str>, profile_dir: &str) -> Result<()> {
+    let mut cmd = Command::new(browser_bin);
     cmd.arg(format!("--profile-directory={profile_dir}"));
     if let Some(url) = url {
         cmd.arg(url);
@@ -84,6 +42,6 @@ pub(crate) fn launch(helium_bin: &str, url: Option<&str>, profile_dir: &str) -> 
     }
 
     cmd.spawn()
-        .with_context(|| format!("launching {helium_bin}"))?;
+        .with_context(|| format!("launching {browser_bin}"))?;
     Ok(())
 }
