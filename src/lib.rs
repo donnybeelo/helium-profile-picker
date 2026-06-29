@@ -8,6 +8,8 @@ pub(crate) mod constants;
 pub(crate) mod models;
 pub(crate) mod process;
 pub(crate) mod profiles;
+#[cfg(target_os = "windows")]
+pub(crate) mod register;
 pub(crate) mod ui;
 
 pub fn run() -> Result<()> {
@@ -19,12 +21,28 @@ pub fn run() -> Result<()> {
     use crate::config::{load_browser_config, normalize_url};
     use crate::profiles::load_profiles;
 
+    let args: Vec<String> = env::args().skip(1).collect();
+
+    #[cfg(target_os = "windows")]
+    {
+        if args.iter().any(|a| a == "--set-default") {
+            if let Err(e) = register::register() {
+                eprintln!("Warning: could not register app: {e}");
+            }
+            register::open_default_apps_settings();
+            return Ok(());
+        }
+        if let Err(e) = register::register() {
+            eprintln!("Warning: could not register app: {e}");
+        }
+    }
+
     let browser_config = load_browser_config().unwrap_or_else(|e| {
         eprintln!("Error: {e}");
         std::process::exit(1);
     });
 
-    let url = normalize_url(&env::args().skip(1).collect::<Vec<_>>().join(" "));
+    let url = normalize_url(&args.join(" "));
     let profiles = load_profiles(browser_config.config_dir_path());
 
     if profiles.is_empty() {

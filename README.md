@@ -25,7 +25,19 @@ cargo install --git https://github.com/donnybeelo/chromium-profile-picker --no-d
 
 Replace `helium` with the feature for your browser. Only one feature should be active at a time.
 
+### Linux
+
 Locate your `.desktop` file for your browser and set `chromium-profile-picker` as the `Exec` command. Do the same for the "New Window" desktop action if it exists.
+
+### Windows
+
+Run once after installing to register the app and open the Default apps settings page:
+
+```powershell
+chromium-profile-picker --set-default
+```
+
+Find the app in the list (e.g. "Microsoft Edge Profile Picker") and set it as the default browser. The app registers itself automatically on every launch, so re-running `--set-default` after an update is enough to keep the registration current.
 
 ## Configuration
 
